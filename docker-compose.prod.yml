@@ -1,0 +1,24 @@
+# Production stack for the portfolio/CV site — a single static-file container.
+# No backend, no database, no auth: the whole site is served straight out of
+# this repo's checkout.
+#
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# Requires the `shared-infra` Docker network to already exist, created by the
+# sibling `fanvote` stack's docker-compose.prod.yml (deploy/start that first —
+# it also holds the Caddy reverse proxy that fronts this site on
+# PORTFOLIO_DOMAIN, see its deploy/Caddyfile).
+
+services:
+  web:
+    image: nginx:1.27-alpine
+    container_name: portfolio-cv
+    restart: unless-stopped
+    volumes:
+      - .:/usr/share/nginx/html:ro
+    mem_limit: 32m
+    networks: [shared-infra]
+
+networks:
+  shared-infra:
+    external: true
